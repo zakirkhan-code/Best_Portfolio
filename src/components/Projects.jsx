@@ -118,7 +118,7 @@ function ProjectMedia({ project }) {
   const [loadedImages, setLoadedImages] = useState([]);
   const [autoSliding, setAutoSliding] = useState(false);
   const intervalRef = useRef(null);
-
+ 
   // Generate image paths: slug-1.png, slug-2.png, etc.
   const imageCount = project.imageCount || 1;
   const imagePaths = Array.from({ length: imageCount }, (_, i) =>
@@ -127,7 +127,7 @@ function ProjectMedia({ project }) {
   const videoPath = `/videos/${project.slug}.mp4`;
   const hasVideo = !videoError;
   const hasMultipleImages = loadedImages.length > 1;
-
+ 
   // Track which images actually loaded
   const handleImgLoad = useCallback((index) => {
     setLoadedImages((prev) => {
@@ -135,11 +135,11 @@ function ProjectMedia({ project }) {
       return [...prev, index].sort((a, b) => a - b);
     });
   }, []);
-
+ 
   const handleImgError = useCallback((index) => {
     // Don't add to loadedImages
   }, []);
-
+ 
   // Auto-slide on hover when multiple images & no video
   useEffect(() => {
     if (isHovered && hasMultipleImages && (!hasVideo || !videoLoaded)) {
@@ -158,7 +158,7 @@ function ProjectMedia({ project }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isHovered, hasMultipleImages, hasVideo, videoLoaded, loadedImages.length]);
-
+ 
   const handleMouseEnter = () => {
     setIsHovered(true);
     if (videoRef.current && hasVideo) {
@@ -166,7 +166,7 @@ function ProjectMedia({ project }) {
       videoRef.current.play().catch(() => {});
     }
   };
-
+ 
   const handleMouseLeave = () => {
     setIsHovered(false);
     setCurrentImg(0);
@@ -175,7 +175,7 @@ function ProjectMedia({ project }) {
       videoRef.current.currentTime = 0;
     }
   };
-
+ 
   const goToSlide = (e, idx) => {
     e.stopPropagation();
     setCurrentImg(idx);
@@ -187,17 +187,17 @@ function ProjectMedia({ project }) {
       }, 1800);
     }
   };
-
+ 
   const goNext = (e) => {
     e.stopPropagation();
     setCurrentImg((prev) => (prev + 1) % loadedImages.length);
   };
-
+ 
   const goPrev = (e) => {
     e.stopPropagation();
     setCurrentImg((prev) => (prev - 1 + loadedImages.length) % loadedImages.length);
   };
-
+ 
   return (
     <div
       onMouseEnter={handleMouseEnter}
@@ -238,7 +238,7 @@ function ProjectMedia({ project }) {
           }}
         />
       ))}
-
+ 
       {/* Fallback if NO images loaded */}
       {loadedImages.length === 0 && (
         <div style={{
@@ -268,7 +268,7 @@ function ProjectMedia({ project }) {
           }} />
         </div>
       )}
-
+ 
       {/* === VIDEO LAYER === */}
       <video
         ref={videoRef}
@@ -287,7 +287,7 @@ function ProjectMedia({ project }) {
           zIndex: 2,
         }}
       />
-
+ 
       {/* === OVERLAY === */}
       <div style={{
         position: 'absolute', inset: 0, zIndex: 3,
@@ -314,7 +314,7 @@ function ProjectMedia({ project }) {
           </motion.div>
         )}
       </div>
-
+ 
       {/* === NAVIGATION ARROWS (multiple images, no video playing) === */}
       {hasMultipleImages && isHovered && !(hasVideo && videoLoaded) && (
         <>
@@ -348,7 +348,7 @@ function ProjectMedia({ project }) {
           </motion.button>
         </>
       )}
-
+ 
       {/* === DOTS INDICATOR === */}
       {hasMultipleImages && !(hasVideo && videoLoaded && isHovered) && (
         <div style={{
@@ -375,7 +375,7 @@ function ProjectMedia({ project }) {
           ))}
         </div>
       )}
-
+ 
       {/* === VIDEO PLAYING INDICATOR === */}
       {isHovered && videoLoaded && hasVideo && (
         <motion.div
@@ -395,7 +395,7 @@ function ProjectMedia({ project }) {
           <span style={{ fontSize: '0.65rem', color: '#fff', fontWeight: 500 }}>Playing Demo</span>
         </motion.div>
       )}
-
+ 
       <style>{`
         @keyframes pulse-dot {
           0%, 100% { opacity: 1; }
@@ -405,29 +405,31 @@ function ProjectMedia({ project }) {
     </div>
   );
 }
-
-function ProjectCard({ project, index, inView }) {
+ 
+function ProjectCard({ project, index, inView, onOpenDetail }) {
   const isEven = index % 2 === 0;
-
+ 
   return (
     <motion.div
       initial={{ opacity: 0, y: 60 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ delay: 0.15 * (index % 4), duration: 0.6, type: 'spring', stiffness: 80 }}
       whileHover={{ borderColor: `${project.color}60`, boxShadow: `0 8px 40px ${project.color}15` }}
+      onClick={() => onOpenDetail(project)}
       style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border-color)',
         borderRadius: '16px',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
+        cursor: 'pointer',
       }}
     >
       {/* Media Area — thumbnail + hover video */}
       <div style={{ padding: '1rem 1rem 0' }}>
         <ProjectMedia project={project} />
       </div>
-
+ 
       {/* Content */}
       <div style={{ padding: '1.2rem' }}>
         {/* Chain Badge */}
@@ -444,7 +446,7 @@ function ProjectCard({ project, index, inView }) {
         }}>
           {project.chain}
         </div>
-
+ 
         <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.2rem' }}>
           {project.title}
         </h3>
@@ -454,7 +456,7 @@ function ProjectCard({ project, index, inView }) {
         <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1rem', fontWeight: 300 }}>
           {project.description}
         </p>
-
+ 
         {/* Features */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
           {project.features.slice(0, 3).map((f) => (
@@ -472,13 +474,14 @@ function ProjectCard({ project, index, inView }) {
             <span style={{
               padding: '0.2rem 0.5rem',
               fontSize: '0.7rem',
-              color: 'var(--text-muted)',
+              color: 'var(--orange-light)',
+              cursor: 'pointer',
             }}>
-              +{project.features.length - 3} more
+              +{project.features.length - 3} more →
             </span>
           )}
         </div>
-
+ 
         {/* Tech Stack */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '1rem' }}>
           {project.tech.map((t) => (
@@ -494,28 +497,302 @@ function ProjectCard({ project, index, inView }) {
             </span>
           ))}
         </div>
-
+ 
         {/* Links */}
-        <div style={{ display: 'flex', gap: '0.8rem' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <motion.a
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             whileHover={{ color: 'var(--orange-primary)' }}
             style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', transition: 'color 0.2s' }}
           >
             <FiGithub /> Code
           </motion.a>
+          <span style={{ fontSize: '0.8rem', color: 'var(--orange-light)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <FiExternalLink style={{ fontSize: '0.75rem' }} /> Details
+          </span>
         </div>
       </div>
     </motion.div>
   );
 }
-
+ 
+/* ======================== PROJECT DETAIL MODAL ======================== */
+function ProjectDetailModal({ project, onClose }) {
+  if (!project) return null;
+ 
+  const imageCount = project.imageCount || 1;
+  const imagePaths = Array.from({ length: imageCount }, (_, i) =>
+    `/images/${project.slug}-${i + 1}.png`
+  );
+  const videoPath = `/videos/${project.slug}.mp4`;
+ 
+  // Close on Escape key
+  useEffect(() => {
+    const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handleEsc);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+ 
+  const [currentImg, setCurrentImg] = useState(0);
+  const [loadedImgs, setLoadedImgs] = useState([]);
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoAvailable, setVideoAvailable] = useState(true);
+ 
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.85)',
+        backdropFilter: 'blur(10px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '2rem',
+        overflowY: 'auto',
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 50, scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--bg-card)',
+          border: `1px solid ${project.color}40`,
+          borderRadius: '20px',
+          maxWidth: 900,
+          width: '100%',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          position: 'relative',
+        }}
+      >
+        {/* Close Button */}
+        <motion.button
+          whileHover={{ scale: 1.1, background: 'var(--orange-primary)' }}
+          onClick={onClose}
+          style={{
+            position: 'sticky', top: 12, float: 'right', marginRight: 12,
+            zIndex: 10, width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)', border: '1px solid var(--border-color)',
+            color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', fontSize: '1.1rem', transition: 'all 0.2s',
+          }}
+        >
+          <FiX />
+        </motion.button>
+ 
+        {/* Media Section */}
+        <div style={{ padding: '1.5rem 1.5rem 0' }}>
+          <div style={{
+            position: 'relative', width: '100%', paddingTop: '50%',
+            borderRadius: '12px', overflow: 'hidden',
+            background: `linear-gradient(135deg, ${project.color}10, var(--bg-secondary))`,
+            border: `1px solid ${project.color}30`,
+          }}>
+            {/* Images */}
+            {!showVideo && imagePaths.map((path, i) => (
+              <img
+                key={i}
+                src={path}
+                alt={`${project.title} ${i + 1}`}
+                onLoad={() => setLoadedImgs((prev) => prev.includes(i) ? prev : [...prev, i].sort((a, b) => a - b))}
+                style={{
+                  position: 'absolute', inset: 0, width: '100%', height: '100%',
+                  objectFit: 'cover',
+                  opacity: loadedImgs.indexOf(i) === currentImg ? 1 : 0,
+                  transition: 'opacity 0.4s ease',
+                }}
+              />
+            ))}
+ 
+            {/* Video */}
+            {showVideo && videoAvailable && (
+              <video
+                src={videoPath}
+                controls
+                autoPlay
+                onError={() => { setVideoAvailable(false); setShowVideo(false); }}
+                style={{
+                  position: 'absolute', inset: 0, width: '100%', height: '100%',
+                  objectFit: 'cover', zIndex: 2,
+                }}
+              />
+            )}
+ 
+            {/* Fallback */}
+            {loadedImgs.length === 0 && !showVideo && (
+              <div style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexDirection: 'column', gap: '0.5rem',
+              }}>
+                <span style={{ fontSize: '3rem', fontFamily: "'Space Mono', monospace", fontWeight: 700, color: `${project.color}30` }}>
+                  {project.title.split(' ').map(w => w[0]).join('')}
+                </span>
+              </div>
+            )}
+ 
+            {/* Image Navigation */}
+            {!showVideo && loadedImgs.length > 1 && (
+              <>
+                <button onClick={() => setCurrentImg((prev) => (prev - 1 + loadedImgs.length) % loadedImgs.length)}
+                  style={{
+                    position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', zIndex: 3,
+                    width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.6)',
+                    border: `1px solid ${project.color}40`, color: '#fff', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                ><FiChevronLeft /></button>
+                <button onClick={() => setCurrentImg((prev) => (prev + 1) % loadedImgs.length)}
+                  style={{
+                    position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', zIndex: 3,
+                    width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.6)',
+                    border: `1px solid ${project.color}40`, color: '#fff', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                ><FiChevronRight /></button>
+                <div style={{
+                  position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)',
+                  zIndex: 3, display: 'flex', gap: 5, padding: '0.2rem 0.5rem',
+                  background: 'rgba(0,0,0,0.5)', borderRadius: 20, backdropFilter: 'blur(8px)',
+                }}>
+                  {loadedImgs.map((_, i) => (
+                    <button key={i} onClick={() => setCurrentImg(i)}
+                      style={{
+                        width: currentImg === i ? 18 : 7, height: 7, borderRadius: 4,
+                        background: currentImg === i ? project.color : 'rgba(255,255,255,0.4)',
+                        border: 'none', cursor: 'pointer', transition: 'all 0.3s', padding: 0,
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+ 
+          {/* Toggle: Images / Video */}
+          {videoAvailable && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.8rem' }}>
+              <button onClick={() => setShowVideo(false)}
+                style={{
+                  padding: '0.4rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 500,
+                  background: !showVideo ? project.color : 'var(--bg-secondary)',
+                  color: !showVideo ? '#fff' : 'var(--text-muted)',
+                  transition: 'all 0.2s',
+                }}
+              >Screenshots</button>
+              <button onClick={() => setShowVideo(true)}
+                style={{
+                  padding: '0.4rem 1rem', borderRadius: '6px', border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 500,
+                  background: showVideo ? project.color : 'var(--bg-secondary)',
+                  color: showVideo ? '#fff' : 'var(--text-muted)',
+                  display: 'flex', alignItems: 'center', gap: '0.3rem',
+                  transition: 'all 0.2s',
+                }}
+              ><FiPlay style={{ fontSize: '0.7rem' }} /> Video Demo</button>
+            </div>
+          )}
+        </div>
+ 
+        {/* Details Content */}
+        <div style={{ padding: '1.5rem' }}>
+          {/* Header */}
+          <div style={{ marginBottom: '1.2rem' }}>
+            <div style={{
+              display: 'inline-block', padding: '0.2rem 0.7rem', marginBottom: '0.5rem',
+              background: `${project.color}15`, border: `1px solid ${project.color}30`,
+              borderRadius: '50px', fontSize: '0.72rem', color: project.color, fontWeight: 500,
+            }}>
+              {project.chain}
+            </div>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+              {project.title}
+            </h2>
+            <p style={{
+              fontSize: '1rem', color: 'var(--orange-light)',
+              fontFamily: "'Space Mono', monospace", marginBottom: '0.8rem',
+            }}>
+              {project.subtitle}
+            </p>
+            <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.8, fontWeight: 300 }}>
+              {project.description}
+            </p>
+          </div>
+ 
+          {/* Features */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-primary)' }}>
+              Key Features
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem' }}>
+              {project.features.map((f) => (
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ color: project.color, fontSize: '0.6rem' }}>&#9670;</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{f}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+ 
+          {/* Tech Stack */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.8rem', color: 'var(--text-primary)' }}>
+              Tech Stack
+            </h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {project.tech.map((t) => (
+                <span key={t} style={{
+                  padding: '0.3rem 0.8rem', border: `1px solid ${project.color}30`,
+                  borderRadius: '6px', fontSize: '0.8rem', color: project.color,
+                  fontFamily: "'Space Mono', monospace", background: `${project.color}08`,
+                }}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+ 
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <motion.a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.03, boxShadow: `0 0 20px ${project.color}30` }}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                padding: '0.7rem 1.5rem', background: project.color,
+                color: '#fff', borderRadius: '8px', fontWeight: 600, fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+              }}
+            >
+              <FiGithub /> View on GitHub
+            </motion.a>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+ 
 export default function Projects() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
-
+  const [selectedProject, setSelectedProject] = useState(null);
+ 
   return (
     <section id="projects" style={{ padding: '7rem 0' }}>
       <div className="section-container" ref={ref}>
@@ -530,17 +807,33 @@ export default function Projects() {
           </h2>
           <p className="section-subtitle">Real-world blockchain solutions I've architected and built</p>
         </motion.div>
-
+ 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
           gap: '1.5rem',
         }}>
           {projects.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} inView={inView} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={i}
+              inView={inView}
+              onOpenDetail={setSelectedProject}
+            />
           ))}
         </div>
       </div>
+ 
+      {/* Project Detail Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectDetailModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
