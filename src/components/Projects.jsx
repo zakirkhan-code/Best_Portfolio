@@ -1,6 +1,6 @@
 import { motion, useInView, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { FiExternalLink, FiGithub, FiPlay, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiExternalLink, FiPlay, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const projects = [
   {
@@ -13,7 +13,6 @@ const projects = [
     tech: ['Solidity 0.8.28', 'Foundry', 'Node.js', 'TypeScript', 'Prisma', 'React 19', 'React Native', 'Chainlink', 'ethers.js v6'],
     chain: 'Sepolia',
     features: ['10 Smart Contracts', 'Two-Wallet Treasury', 'Batch KYC (100/tx)', 'Chainlink FX Oracles', 'Privacy-First (No PII)', 'Mobile + Admin App'],
-    github: 'https://github.com/zakirkhan-code',
     color: '#00875A',
   },
   {
@@ -26,7 +25,6 @@ const projects = [
     tech: ['Solidity', 'Foundry', 'React', 'Vite', 'ethers.js'],
     chain: 'Sepolia',
     features: ['Token Swapping', 'Liquidity Pools', 'Admin Dashboard', 'Token Faucet', 'Security Audited'],
-    github: 'https://github.com/zakirkhan-code/MiniAMM',
     color: '#ff6b00',
   },
   {
@@ -39,7 +37,6 @@ const projects = [
     tech: ['Solidity', 'Node.js', 'Express', 'React', 'React Native', 'AI/ML'],
     chain: 'Sepolia',
     features: ['6 Smart Contracts', '35+ APIs', 'Mobile App', 'AI Chat Integration', 'Atomic Records'],
-    github: 'https://github.com/zakirkhan-code/MedChain-AI',
     color: '#00d4aa',
   },
   {
@@ -52,7 +49,6 @@ const projects = [
     tech: ['Solidity', 'ERC-3643', 'Hardhat', 'React', 'ethers.js'],
     chain: 'Arbitrum',
     features: ['8 Smart Contracts', 'ERC-3643 Compliant', 'KYC Registry', 'Auction System', 'Mainnet Deployed'],
-    github: 'https://github.com/AspireX24/fann_contract',
     color: '#28A0F0',
   },
   {
@@ -65,7 +61,6 @@ const projects = [
     tech: ['React', 'TypeScript', 'Solidity', 'Multi-chain'],
     chain: 'Multi-Chain',
     features: ['Yield Optimization', 'Multi-Chain Support', 'Protocol Aggregation', 'Portfolio Dashboard'],
-    github: 'https://github.com/zakirkhan-code',
     color: '#8247E5',
   },
   {
@@ -78,7 +73,6 @@ const projects = [
     tech: ['Solidity', 'React Native', 'Hardhat', 'Node.js'],
     chain: 'Sepolia',
     features: ['Lending/Borrowing', 'Mobile App', 'Interest Rates', 'Collateral Management'],
-    github: 'https://github.com/zakirkhan-code/DEFI_LENDING_APP',
     color: '#F0B90B',
   },
   {
@@ -91,7 +85,6 @@ const projects = [
     tech: ['Solidity', 'Node.js', 'React', 'IPFS', 'OpenAI'],
     chain: 'Sepolia',
     features: ['Soulbound Tokens', 'IPFS Storage', 'AI Integration', 'Credential Verification'],
-    github: 'https://github.com/zakirkhan-code/Credentials_System',
     color: '#E44D26',
   },
   {
@@ -104,7 +97,6 @@ const projects = [
     tech: ['Solidity', 'React', 'Cross-chain', 'ethers.js'],
     chain: 'Multi-Chain',
     features: ['Cross-Chain Transfers', 'Portfolio Management', 'Multi-Network', 'Unified Interface'],
-    github: 'https://github.com/zakirkhan-code',
     color: '#00d4aa',
   },
   {
@@ -117,7 +109,6 @@ const projects = [
     tech: ['React Native', 'Monero', 'Cryptography'],
     chain: 'Monero',
     features: ['Secure Wallet', 'Transaction History', 'Key Management', 'Mobile-First'],
-    github: 'https://github.com/zakirkhan-code/Monero_Wallet_App',
     color: '#FF6600',
   },
 ];
@@ -554,18 +545,8 @@ function ProjectCard({ project, index, inView, onOpenDetail }) {
  
         {/* Links */}
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <motion.a
-            href={project.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            whileHover={{ color: 'var(--orange-primary)' }}
-            style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', transition: 'color 0.2s' }}
-          >
-            <FiGithub /> Code
-          </motion.a>
           <span style={{ fontSize: '0.8rem', color: 'var(--orange-light)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <FiExternalLink style={{ fontSize: '0.75rem' }} /> Details
+            <FiExternalLink style={{ fontSize: '0.75rem' }} /> View Details
           </span>
         </div>
       </div>
@@ -819,23 +800,6 @@ function ProjectDetailModal({ project, onClose }) {
             </div>
           </div>
  
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <motion.a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.03, boxShadow: `0 0 20px ${project.color}30` }}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                padding: '0.7rem 1.5rem', background: project.color,
-                color: '#fff', borderRadius: '8px', fontWeight: 600, fontSize: '0.9rem',
-                display: 'flex', alignItems: 'center', gap: '0.5rem',
-              }}
-            >
-              <FiGithub /> View on GitHub
-            </motion.a>
-          </div>
         </div>
       </motion.div>
     </motion.div>
