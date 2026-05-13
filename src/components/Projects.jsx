@@ -5,6 +5,19 @@ import { FiExternalLink, FiGithub, FiPlay, FiX, FiChevronLeft, FiChevronRight } 
 const projects = [
   {
     id: 1,
+    title: 'SafarPay',
+    slug: 'safarpay',
+    imageCount: 1, // put safarpay-1.png in public/images/ when ready
+    subtitle: 'Cross-Border Remittance DApp (UAE ↔ Pakistan)',
+    description: 'Production-grade remittance platform combining an instant off-chain customer ledger with publicly auditable on-chain treasury settlement. ~30 second end-to-end transfers at 1% all-in fee. 10 verified smart contracts on Sepolia, two-wallet treasury (UAE + PK operators), batch KYC processing 100 users per transaction, and 51 Foundry tests with fuzz + invariant coverage. Full mobile app, admin operations dashboard, and Node.js backend with Socket.io real-time layer.',
+    tech: ['Solidity 0.8.28', 'Foundry', 'Node.js', 'TypeScript', 'Prisma', 'React 19', 'React Native', 'Chainlink', 'ethers.js v6'],
+    chain: 'Sepolia',
+    features: ['10 Smart Contracts', 'Two-Wallet Treasury', 'Batch KYC (100/tx)', 'Chainlink FX Oracles', 'Privacy-First (No PII)', 'Mobile + Admin App'],
+    github: 'https://github.com/zakirkhan-code',
+    color: '#00875A',
+  },
+  {
+    id: 2,
     title: 'MiniAMM',
     slug: 'miniamm',
     imageCount: 1, // put miniamm-1.png, miniamm-2.png, etc in public/images/
@@ -17,7 +30,7 @@ const projects = [
     color: '#ff6b00',
   },
   {
-    id: 2,
+    id: 3,
     title: 'MedChain AI',
     slug: 'medchain-ai',
     imageCount: 5,
@@ -30,7 +43,7 @@ const projects = [
     color: '#00d4aa',
   },
   {
-    id: 3,
+    id: 4,
     title: 'RWA Tokenization Platform',
     slug: 'rwa-tokenization',
     imageCount: 1,
@@ -43,7 +56,7 @@ const projects = [
     color: '#28A0F0',
   },
   {
-    id: 4,
+    id: 5,
     title: 'DeepYield Finance',
     slug: 'deepyield',
     imageCount: 4,
@@ -56,7 +69,7 @@ const projects = [
     color: '#8247E5',
   },
   {
-    id: 5,
+    id: 6,
     title: 'DeFi Lending Platform',
     slug: 'defi-lending',
     imageCount: 4,
@@ -69,7 +82,7 @@ const projects = [
     color: '#F0B90B',
   },
   {
-    id: 6,
+    id: 7,
     title: 'Soulbound NFT Credentials',
     slug: 'soulbound-nft',
     imageCount: 10,
@@ -82,7 +95,7 @@ const projects = [
     color: '#E44D26',
   },
   {
-    id: 7,
+    id: 8,
     title: 'ChainBridge Pro',
     slug: 'chainbridge-pro',
     imageCount: 4,
@@ -95,7 +108,7 @@ const projects = [
     color: '#00d4aa',
   },
   {
-    id: 8,
+    id: 9,
     title: 'Monero Wallet',
     slug: 'monero-wallet',
     imageCount: 8,

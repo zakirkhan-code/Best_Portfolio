@@ -46,6 +46,15 @@ function FloatingParticles() {
 export default function Hero() {
   const titleWords = ['Blockchain', '&', 'Web3', 'Developer'];
 
+  const handleNavClick = (e, href) => {
+    e.preventDefault();
+    const el = document.getElementById(href.replace('#', ''));
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section
       id="home"
@@ -158,7 +167,7 @@ export default function Hero() {
             fontWeight: 300,
           }}
         >
-          3+ years building DeFi protocols, smart contracts & full-stack dApps
+          4+ years building DeFi protocols, smart contracts & full-stack dApps
           across Ethereum, Arbitrum, Polygon & BSC. Specializing in Solidity,
           security auditing & multi-chain architecture.
         </motion.p>
@@ -171,6 +180,7 @@ export default function Hero() {
         >
           <motion.a
             href="#projects"
+            onClick={(e) => handleNavClick(e, '#projects')}
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px var(--orange-glow-strong)' }}
             whileTap={{ scale: 0.95 }}
             style={{
@@ -189,6 +199,7 @@ export default function Hero() {
           </motion.a>
           <motion.a
             href="#contact"
+            onClick={(e) => handleNavClick(e, '#contact')}
             whileHover={{ scale: 1.05, borderColor: 'var(--orange-primary)' }}
             whileTap={{ scale: 0.95 }}
             style={{

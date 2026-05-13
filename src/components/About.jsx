@@ -10,7 +10,7 @@ const highlights = [
 ];
 
 const stats = [
-  { value: '3+', label: 'Years Experience' },
+  { value: '4', label: 'Years Experience' },
   { value: '10+', label: 'Projects Built' },
   { value: '4+', label: 'Chains Deployed' },
   { value: '8+', label: 'Smart Contracts' },
@@ -50,7 +50,7 @@ export default function About() {
           >
             <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', fontWeight: 300 }}>
               I'm <strong style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Zakir Khan</strong>, a Blockchain & Full-Stack Web3 Developer from Pakistan
-              with over 3 years of experience in designing, developing, and deploying decentralized applications.
+              with over 4 years of experience in designing, developing, and deploying decentralized applications.
             </p>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: 'var(--text-secondary)', fontWeight: 300 }}>
               My expertise spans the entire Web3 stack — from writing gas-optimized Solidity smart contracts

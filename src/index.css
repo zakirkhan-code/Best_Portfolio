@@ -28,6 +28,10 @@ html {
   scrollbar-color: var(--orange-primary) var(--bg-secondary);
 }
 
+section[id] {
+  scroll-margin-top: 80px;
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   background: var(--bg-primary);
