@@ -1,6 +1,36 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useRef, useEffect } from 'react';
 import { FiGithub, FiLinkedin, FiMail, FiArrowDown } from 'react-icons/fi';
 import { SiWhatsapp } from 'react-icons/si';
+
+function MagneticButton({ children, strength = 0.35, ...props }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 200, damping: 18, mass: 0.5 });
+  const sy = useSpring(y, { stiffness: 200, damping: 18, mass: 0.5 });
+
+  const handleMove = (e) => {
+    const rect = ref.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    x.set((e.clientX - cx) * strength);
+    y.set((e.clientY - cy) * strength);
+  };
+  const handleLeave = () => { x.set(0); y.set(0); };
+
+  return (
+    <motion.a
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ x: sx, y: sy, ...(props.style || {}) }}
+      {...props}
+    >
+      {children}
+    </motion.a>
+  );
+}
 
 const socials = [
   { icon: <FiGithub />, href: 'https://github.com/zakirkhan-code', label: 'GitHub' },
@@ -9,37 +39,143 @@ const socials = [
   { icon: <SiWhatsapp />, href: 'https://wa.me/923164747689', label: 'WhatsApp' },
 ];
 
-function FloatingParticles() {
+function ConstellationNetwork() {
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let raf;
+    let dpr = window.devicePixelRatio || 1;
+
+    const resize = () => {
+      const parent = canvas.parentElement;
+      const w = parent.clientWidth;
+      const h = parent.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const W = () => canvas.width / dpr;
+    const H = () => canvas.height / dpr;
+
+    const count = Math.min(80, Math.floor((W() * H()) / 18000));
+    const points = Array.from({ length: count }, () => ({
+      x: Math.random() * W(),
+      y: Math.random() * H(),
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.4 + 0.6,
+      pulse: Math.random() * Math.PI * 2,
+    }));
+
+    const handleMouse = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current.x = e.clientX - rect.left;
+      mouseRef.current.y = e.clientY - rect.top;
+    };
+    const handleLeave = () => {
+      mouseRef.current.x = -1000;
+      mouseRef.current.y = -1000;
+    };
+    window.addEventListener('mousemove', handleMouse);
+    window.addEventListener('mouseleave', handleLeave);
+
+    const LINK_DIST = 140;
+    const MOUSE_DIST = 180;
+
+    const animate = (time) => {
+      ctx.clearRect(0, 0, W(), H());
+
+      points.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > W()) p.vx *= -1;
+        if (p.y < 0 || p.y > H()) p.vy *= -1;
+        p.pulse += 0.02;
+      });
+
+      // Lines between close points
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          const dx = points[i].x - points[j].x;
+          const dy = points[i].y - points[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < LINK_DIST) {
+            const alpha = (1 - dist / LINK_DIST) * 0.18;
+            ctx.strokeStyle = `rgba(255, 107, 0, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(points[i].x, points[i].y);
+            ctx.lineTo(points[j].x, points[j].y);
+            ctx.stroke();
+          }
+        }
+
+        // Mouse-to-point line (cursor magnetism)
+        const mdx = points[i].x - mouseRef.current.x;
+        const mdy = points[i].y - mouseRef.current.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < MOUSE_DIST) {
+          const alpha = (1 - mdist / MOUSE_DIST) * 0.45;
+          ctx.strokeStyle = `rgba(255, 140, 58, ${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(points[i].x, points[i].y);
+          ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
+          ctx.stroke();
+        }
+      }
+
+      // Points with pulse
+      points.forEach((p) => {
+        const pulseScale = 1 + Math.sin(p.pulse) * 0.3;
+        const r = p.r * pulseScale;
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
+        grad.addColorStop(0, 'rgba(255, 140, 58, 0.7)');
+        grad.addColorStop(1, 'rgba(255, 107, 0, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 170, 90, 0.85)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMouse);
+      window.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      {Array.from({ length: 30 }).map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{
-            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1200),
-            y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
-            opacity: 0,
-          }}
-          animate={{
-            y: [null, Math.random() * -400 - 100],
-            opacity: [0, Math.random() * 0.4 + 0.1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 8 + 6,
-            repeat: Infinity,
-            delay: Math.random() * 5,
-            ease: 'linear',
-          }}
-          style={{
-            position: 'absolute',
-            width: Math.random() * 3 + 1,
-            height: Math.random() * 3 + 1,
-            background: i % 3 === 0 ? 'var(--orange-primary)' : 'var(--text-muted)',
-            borderRadius: '50%',
-          }}
-        />
-      ))}
-    </div>
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        opacity: 0.85,
+      }}
+    />
   );
 }
 
@@ -65,25 +201,35 @@ export default function Hero() {
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
+        paddingTop: '100px',
+        paddingBottom: '60px',
       }}
     >
-      {/* Background gradient orbs */}
+      {/* Background gradient orbs — breathing */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-        <div style={{
-          position: 'absolute', top: '-20%', right: '-10%',
-          width: 600, height: 600, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,107,0,0.08) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '-20%', left: '-10%',
-          width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,140,58,0.05) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-        }} />
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute', top: '-20%', right: '-10%',
+            width: 600, height: 600, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,107,0,0.10) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          style={{
+            position: 'absolute', bottom: '-20%', left: '-10%',
+            width: 500, height: 500, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,140,58,0.06) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
       </div>
 
-      <FloatingParticles />
+      <ConstellationNetwork />
 
       {/* Grid pattern overlay */}
       <div style={{
@@ -178,7 +324,7 @@ export default function Hero() {
           transition={{ delay: 1.2, duration: 0.5 }}
           style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}
         >
-          <motion.a
+          <MagneticButton
             href="#projects"
             onClick={(e) => handleNavClick(e, '#projects')}
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px var(--orange-glow-strong)' }}
@@ -190,14 +336,15 @@ export default function Hero() {
               borderRadius: '8px',
               fontWeight: 600,
               fontSize: '0.95rem',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
+              cursor: 'pointer',
             }}
           >
             View Projects
-          </motion.a>
-          <motion.a
+          </MagneticButton>
+          <MagneticButton
             href="#contact"
             onClick={(e) => handleNavClick(e, '#contact')}
             whileHover={{ scale: 1.05, borderColor: 'var(--orange-primary)' }}
@@ -211,10 +358,13 @@ export default function Hero() {
               fontWeight: 600,
               fontSize: '0.95rem',
               transition: 'border-color 0.3s',
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: 'pointer',
             }}
           >
             Get In Touch
-          </motion.a>
+          </MagneticButton>
         </motion.div>
 
         <motion.div

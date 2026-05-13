@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { FiCode, FiShield, FiLayers, FiGlobe } from 'react-icons/fi';
 
 const highlights = [
@@ -17,7 +17,28 @@ const stats = [
 ];
 
 function CountUp({ value }) {
-  return <span>{value}</span>;
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-50px' });
+  const target = parseInt(value, 10) || 0;
+  const suffix = String(value).replace(/^\d+/, '');
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const duration = 1600;
+    const start = performance.now();
+    let raf;
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, target]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
 }
 
 export default function About() {

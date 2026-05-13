@@ -61,8 +61,10 @@ export default function Navbar() {
         right: 0,
         zIndex: 1000,
         padding: scrolled ? '0.8rem 2rem' : '1.2rem 2rem',
-        background: scrolled ? 'rgba(17,17,17,0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        background: scrolled
+          ? 'rgba(17,17,17,0.95)'
+          : 'linear-gradient(to bottom, rgba(17,17,17,0.7) 0%, rgba(17,17,17,0.3) 60%, transparent 100%)',
+        backdropFilter: scrolled ? 'blur(20px)' : 'blur(8px)',
         borderBottom: scrolled ? '1px solid var(--border-color)' : 'none',
         transition: 'all 0.3s ease',
       }}

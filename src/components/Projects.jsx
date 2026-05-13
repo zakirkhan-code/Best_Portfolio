@@ -1,4 +1,4 @@
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { FiExternalLink, FiGithub, FiPlay, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
@@ -420,24 +420,65 @@ function ProjectMedia({ project }) {
 }
  
 function ProjectCard({ project, index, inView, onOpenDetail }) {
-  const isEven = index % 2 === 0;
- 
+  const cardRef = useRef(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const smx = useSpring(mx, { stiffness: 150, damping: 20, mass: 0.3 });
+  const smy = useSpring(my, { stiffness: 150, damping: 20, mass: 0.3 });
+  const rotateX = useTransform(smy, [-0.5, 0.5], ['8deg', '-8deg']);
+  const rotateY = useTransform(smx, [-0.5, 0.5], ['-8deg', '8deg']);
+  const glareX = useTransform(smx, [-0.5, 0.5], ['0%', '100%']);
+  const glareY = useTransform(smy, [-0.5, 0.5], ['0%', '100%']);
+
+  const handleMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width - 0.5);
+    my.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+  const handleLeave = () => { mx.set(0); my.set(0); };
+
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 60 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ delay: 0.15 * (index % 4), duration: 0.6, type: 'spring', stiffness: 80 }}
-      whileHover={{ borderColor: `${project.color}60`, boxShadow: `0 8px 40px ${project.color}15` }}
+      whileHover={{ borderColor: `${project.color}60`, boxShadow: `0 20px 50px ${project.color}25` }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
       onClick={() => onOpenDetail(project)}
       style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border-color)',
         borderRadius: '16px',
         overflow: 'hidden',
-        transition: 'all 0.3s ease',
+        transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
         cursor: 'pointer',
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+        transformPerspective: 1000,
+        position: 'relative',
       }}
     >
+      {/* Glare/sheen overlay following cursor */}
+      <motion.div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background: useTransform(
+            [glareX, glareY],
+            ([gx, gy]) => `radial-gradient(circle at ${gx} ${gy}, ${project.color}22, transparent 55%)`
+          ),
+          opacity: 0.9,
+          zIndex: 4,
+          mixBlendMode: 'screen',
+          borderRadius: '16px',
+        }}
+      />
       {/* Media Area — thumbnail + hover video */}
       <div style={{ padding: '1rem 1rem 0' }}>
         <ProjectMedia project={project} />
