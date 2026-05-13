@@ -40,13 +40,24 @@ export default function Navbar() {
   const handleNavClick = (e, href) => {
     e.preventDefault();
     const id = href.replace('#', '');
-    const el = document.getElementById(id);
-    if (el) {
+    const wasMobileOpen = mobileOpen;
+    setMobileOpen(false);
+
+    const doScroll = () => {
+      const el = document.getElementById(id);
+      if (!el) return;
       const offset = 80; // navbar height
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: 'smooth' });
+    };
+
+    // If mobile menu was open, wait for the close animation before scrolling
+    // so the calculation isn't skewed by the open menu's height
+    if (wasMobileOpen) {
+      setTimeout(doScroll, 320);
+    } else {
+      doScroll();
     }
-    setMobileOpen(false);
   };
 
   return (
